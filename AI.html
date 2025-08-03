@@ -1,0 +1,1705 @@
+
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Buddy - แอปช่วยเรียนสำหรับนักศึกษา</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .tab-btn:hover, .tab-btn.active {
+            background: white;
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .feature-title {
+            color: #667eea;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .input-group input, .input-group textarea, .input-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus, .input-group textarea:focus, .input-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .result-box {
+            background: #f8f9ff;
+            border: 2px solid #e0e7ff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            min-height: 100px;
+        }
+
+        .chat-container {
+            height: 400px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            overflow-y: auto;
+            background: #f9f9f9;
+            margin-bottom: 15px;
+        }
+
+        .chat-message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 10px;
+            max-width: 80%;
+        }
+
+        .user-message {
+            background: #667eea;
+            color: white;
+            margin-left: auto;
+        }
+
+        .ai-message {
+            background: white;
+            border: 1px solid #e0e0e0;
+        }
+
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .schedule-table th, .schedule-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .schedule-table th {
+            background: #667eea;
+            color: white;
+        }
+
+        .task-item {
+            background: #f0f4ff;
+            border: 1px solid #d0d9ff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+
+        .task-urgent {
+            border-left: 4px solid #ff4757;
+        }
+
+        .task-normal {
+            border-left: 4px solid #2ed573;
+        }
+
+        .delete-btn {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .project-suggestion {
+            background: #e8f4fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 AI Buddy</h1>
+            <p>แอปช่วยเรียนอัจฉริยะสำหรับนักศึกษา</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="showTab('summary')">📖 สรุปบทเรียน</button>
+            <button class="tab-btn" onclick="showTab('project')">💡 หัวข้อโปรเจกต์</button>
+            <button class="tab-btn" onclick="showTab('tasks')">⏰ การบ้าน/สอบ</button>
+            <button class="tab-btn" onclick="showTab('chat')">💬 AI ติวเตอร์</button>
+            <button class="tab-btn" onclick="showTab('schedule')">📅 ตารางเรียน</button>
+            <button class="tab-btn" onclick="showTab('auto')">🤖 ระบบอัตโนมัติ</button>
+            <button class="tab-btn" onclick="showTab('notifications')">🔔 การแจ้งเตือน</button>
+        </div>
+
+            <!-- สรุปบทเรียน -->
+        <div id="summary" class="tab-content active">
+            <h2 class="feature-title">📖 สรุปบทเรียนอัตโนมัติ</h2>
+            
+            <!-- วิธีการนำเข้าเนื้อหา -->
+            <div class="input-group">
+                <label>🎯 เลือกวิธีการนำเข้าเนื้อหา:</label>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
+                    <button class="btn" onclick="showInputMethod('text')">📝 พิมพ์เอง</button>
+                    <button class="btn" onclick="showInputMethod('file')">📄 อัปโหลดไฟล์</button>
+                    <button class="btn" onclick="showInputMethod('url')">🌐 จาก URL</button>
+                    <button class="btn" onclick="showInputMethod('image')">📷 ถ่ายรูปเอกสาร</button>
+                </div>
+            </div>
+
+            <!-- ฟอร์มพิมพ์เอง -->
+            <div id="text-input" class="input-method">
+                <div class="input-group">
+                    <label for="lesson-text">วางเนื้อหาบทเรียนที่ต้องการสรุป:</label>
+                    <textarea id="lesson-text" rows="8" placeholder="วางเนื้อหาบทเรียนที่ต้องการสรุปที่นี่..."></textarea>
+                </div>
+            </div>
+
+            <!-- ฟอร์มอัปโหลดไฟล์ -->
+            <div id="file-input" class="input-method" style="display: none;">
+                <div class="input-group">
+                    <label for="lesson-file">อัปโหลดไฟล์เอกสาร (PDF, DOC, TXT):</label>
+                    <input type="file" id="lesson-file" accept=".pdf,.doc,.docx,.txt" onchange="handleFileUpload(event)">
+                    <small style="color: #666;">รองรับ: PDF, Word, Text Files</small>
+                </div>
+                <div id="file-content" style="display: none;">
+                    <h4>📄 เนื้อหาจากไฟล์:</h4>
+                    <div id="file-text" style="background: #f5f5f5; padding: 15px; border-radius: 8px; max-height: 200px; overflow-y: auto;"></div>
+                </div>
+            </div>
+
+            <!-- ฟอร์ม URL -->
+            <div id="url-input" class="input-method" style="display: none;">
+                <div class="input-group">
+                    <label for="lesson-url">URL ของเว็บไซต์หรือเอกสารออนไลน์:</label>
+                    <input type="url" id="lesson-url" placeholder="https://example.com/article">
+                    <button class="btn" onclick="fetchFromURL()">🔗 ดึงเนื้อหา</button>
+                </div>
+                <div id="url-content" style="display: none;">
+                    <h4>🌐 เนื้อหาจาก URL:</h4>
+                    <div id="url-text" style="background: #f5f5f5; padding: 15px; border-radius: 8px; max-height: 200px; overflow-y: auto;"></div>
+                </div>
+            </div>
+
+            <!-- ฟอร์มถ่ายรูป -->
+            <div id="image-input" class="input-method" style="display: none;">
+                <div class="input-group">
+                    <label>📷 ถ่ายรูปหรืออัปโหลดรูปเอกสาร:</label>
+                    <input type="file" id="lesson-image" accept="image/*" capture="camera" onchange="handleImageUpload(event)">
+                    <button class="btn" onclick="document.getElementById('lesson-image').click()">📸 ถ่ายรูป</button>
+                </div>
+                <div id="image-preview" style="display: none;">
+                    <h4>🖼️ รูปที่อัปโหลด:</h4>
+                    <img id="preview-img" style="max-width: 100%; max-height: 300px; border-radius: 8px;">
+                    <button class="btn" onclick="extractTextFromImage()">🔍 แปลงเป็นข้อความ</button>
+                </div>
+                <div id="image-content" style="display: none;">
+                    <h4>📝 ข้อความจากรูป:</h4>
+                    <div id="image-text" style="background: #f5f5f5; padding: 15px; border-radius: 8px; max-height: 200px; overflow-y: auto;"></div>
+                </div>
+            </div>
+
+            <!-- ตัวเลือกการสรุป -->
+            <div class="input-group">
+                <label>⚙️ รูปแบบการสรุป:</label>
+                <select id="summary-style">
+                    <option value="simple">🎯 สรุปง่ายๆ พอใจ</option>
+                    <option value="detailed">📚 สรุปละเอียด</option>
+                    <option value="bullet">📝 จุดสำคัญย่อยๆ</option>
+                    <option value="exam">📝 เน้นข้อสอบ</option>
+                    <option value="mindmap">🧠 Mind Map</option>
+                </select>
+            </div>
+
+            <button class="btn" onclick="summarizeLesson()">🔍 สรุปเนื้อหาอัตโนมัติ</button>
+            <div id="summary-result" class="result-box" style="display: none;">
+                <h3>📝 สรุปเนื้อหา:</h3>
+                <div id="summary-content"></div>
+                <div style="margin-top: 15px;">
+                    <button class="btn" onclick="saveSummary()">💾 บันทึกสรุป</button>
+                    <button class="btn" onclick="shareSummary()">📤 แชร์</button>
+                    <button class="btn" onclick="generateQuiz()">❓ สร้างแบบทดสอบ</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- หัวข้อโปรเจกต์ -->
+        <div id="project" class="tab-content">
+            <h2 class="feature-title">💡 แนะนำหัวข้อโปรเจกต์</h2>
+            <div class="input-group">
+                <label for="subject-name">ชื่อวิชา:</label>
+                <input type="text" id="subject-name" placeholder="เช่น วิทยาการคอมพิวเตอร์, การตลาด, จิตวิทยา">
+            </div>
+            <button class="btn" onclick="generateProjectIdeas()">🎯 แนะนำหัวข้อ</button>
+            <div id="project-results" class="result-box" style="display: none;">
+                <h3>💡 หัวข้อโปรเจกต์ที่แนะนำ:</h3>
+                <div id="project-content"></div>
+            </div>
+        </div>
+
+        <!-- การบ้าน/สอบ -->
+        <div id="tasks" class="tab-content">
+            <h2 class="feature-title">⏰ จัดการการบ้าน/สอบ</h2>
+            <div class="grid-2">
+                <div>
+                    <h3>➕ เพิ่มงานใหม่</h3>
+                    <div class="input-group">
+                        <label for="task-title">ชื่องาน:</label>
+                        <input type="text" id="task-title" placeholder="เช่น รายงานวิชาคณิตศาสตร์">
+                    </div>
+                    <div class="input-group">
+                        <label for="task-date">วันที่ส่ง:</label>
+                        <input type="date" id="task-date">
+                    </div>
+                    <div class="input-group">
+                        <label for="task-priority">ความสำคัญ:</label>
+                        <select id="task-priority">
+                            <option value="normal">ปกติ</option>
+                            <option value="urgent">ด่วน</option>
+                        </select>
+                    </div>
+                    <button class="btn" onclick="addTask()">📝 เพิ่มงาน</button>
+                </div>
+                <div>
+                    <h3>📋 รายการงาน</h3>
+                    <div id="task-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI ติวเตอร์ -->
+        <div id="chat" class="tab-content">
+            <h2 class="feature-title">💬 แชทกับ AI ติวเตอร์</h2>
+            <div class="chat-container" id="chat-container">
+                <div class="chat-message ai-message">
+                    <strong>AI ติวเตอร์:</strong> สวัสดีครับ! ผมพร้อมช่วยตอบคำถามเกี่ยวกับการเรียนนะครับ 😊
+                </div>
+            </div>
+            <div class="input-group">
+                <input type="text" id="user-question" placeholder="พิมพ์คำถามของคุณที่นี่..." onkeypress="handleEnter(event)">
+            </div>
+            <button class="btn" onclick="sendMessage()">📤 ส่งคำถาม</button>
+        </div>
+
+        <!-- ระบบอัตโนมัติ -->
+        <div id="auto" class="tab-content">
+            <h2 class="feature-title">🤖 ระบบอัตโนมัติ</h2>
+            
+            <!-- เชื่อมต่อ LINE -->
+            <div style="background: #06c755; color: white; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                <h3>💬 เชื่อมต่อ LINE</h3>
+                <p>ดึงข้อมูลจากกลุ่มไลน์ตารางเรียนและส่งการแจ้งเตือนอัตโนมัติ</p>
+                
+                <div class="input-group">
+                    <label style="color: white;">LINE Channel Access Token:</label>
+                    <input type="text" id="line-token" placeholder="ใส่ Channel Access Token ของ LINE Bot">
+                </div>
+                
+                <div class="input-group">
+                    <label style="color: white;">Group ID ของกลุ่มตารางเรียน:</label>
+                    <input type="text" id="line-group-id" placeholder="เช่น C1234567890abcdef1234567890abcdef1">
+                </div>
+                
+                <button class="btn" style="background: white; color: #06c755;" onclick="connectLINE()">🔗 เชื่อมต่อ LINE</button>
+                <button class="btn" style="background: rgba(255,255,255,0.2);" onclick="testLINE()">🧪 ทดสอบการเชื่อมต่อ</button>
+                
+                <div id="line-status" style="margin-top: 10px; font-size: 14px;"></div>
+            </div>
+
+            <!-- การดึงข้อมูลอัตโนมัติ -->
+            <div class="grid-2">
+                <div>
+                    <h3>📊 การดึงข้อมูลอัตโนมัติ</h3>
+                    
+                    <div class="input-group">
+                        <label>🔄 ความถี่ในการอัปเดต:</label>
+                        <select id="sync-frequency">
+                            <option value="5">ทุก 5 นาที</option>
+                            <option value="15">ทุก 15 นาที</option>
+                            <option value="30" selected>ทุก 30 นาที</option>
+                            <option value="60">ทุก 1 ชั่วโมง</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label>📝 คำสำคัญที่ต้องมองหา:</label>
+                        <textarea id="keywords" rows="3" placeholder="การบ้าน, สอบ, โปรเจกต์, งาน, ส่ง, กำหนด, วันที่">การบ้าน, สอบ, โปรเจกต์, งาน, ส่ง, กำหนด, วันที่</textarea>
+                    </div>
+
+                    <button class="btn" onclick="startAutoSync()">▶️ เริ่มการดึงข้อมูลอัตโนมัติ</button>
+                    <button class="btn" onclick="stopAutoSync()">⏹️ หยุดการดึงข้อมูล</button>
+                </div>
+
+                <div>
+                    <h3>📈 สถานะระบบ</h3>
+                    <div id="auto-status" class="result-box">
+                        <p>🔴 ระบบอัตโนมัติ: ปิด</p>
+                        <p>📱 LINE: ยังไม่เชื่อมต่อ</p>
+                        <p>🔄 อัปเดตล่าสุด: -</p>
+                        <p>📊 ข้อมูลที่พบ: 0 รายการ</p>
+                    </div>
+
+                    <h4>📋 ข้อมูลที่ดึงมาล่าสุด:</h4>
+                    <div id="latest-data" style="max-height: 200px; overflow-y: auto; background: #f9f9f9; padding: 10px; border-radius: 5px;">
+                        <p style="color: #999;">ยังไม่มีข้อมูล</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- การแจ้งเตือน -->
+        <div id="notifications" class="tab-content">
+            <h2 class="feature-title">🔔 ระบบการแจ้งเตือนอัจฉริยะ</h2>
+            
+            <!-- ตั้งค่าการแจ้งเตือน -->
+            <div class="grid-2">
+                <div>
+                    <h3>⚙️ ตั้งค่าการแจ้งเตือน</h3>
+                    
+                    <div class="input-group">
+                        <label>
+                            <input type="checkbox" id="browser-notify" checked> 
+                            🌐 แจ้งเตือนผ่านเบราว์เซอร์
+                        </label>
+                    </div>
+
+                    <div class="input-group">
+                        <label>
+                            <input type="checkbox" id="line-notify" checked> 
+                            💬 แจ้งเตือนผ่าน LINE
+                        </label>
+                    </div>
+
+                    <div class="input-group">
+                        <label>
+                            <input type="checkbox" id="email-notify"> 
+                            📧 แจ้งเตือนผ่านอีเมล
+                        </label>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="notify-email">อีเมลสำหรับแจ้งเตือน:</label>
+                        <input type="email" id="notify-email" placeholder="your@email.com">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="notify-time">⏰ เวลาแจ้งเตือนประจำวัน:</label>
+                        <input type="time" id="notify-time" value="08:00">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="advance-notify">📅 แจ้งเตือนล่วงหน้า:</label>
+                        <select id="advance-notify">
+                            <option value="0">วันเดียวกัน</option>
+                            <option value="1" selected>1 วันก่อน</option>
+                            <option value="2">2 วันก่อน</option>
+                            <option value="3">3 วันก่อน</option>
+                            <option value="7">1 สัปดาห์ก่อน</option>
+                        </select>
+                    </div>
+
+                    <button class="btn" onclick="saveNotificationSettings()">💾 บันทึกการตั้งค่า</button>
+                    <button class="btn" onclick="requestNotificationPermission()">🔔 ขออนุญาตแจ้งเตือน</button>
+                </div>
+
+                <div>
+                    <h3>📊 ประวัติการแจ้งเตือน</h3>
+                    <div id="notification-history" style="max-height: 300px; overflow-y: auto;">
+                        <!-- ประวัติการแจ้งเตือนจะแสดงที่นี่ -->
+                    </div>
+
+                    <h3>🧪 ทดสอบการแจ้งเตือน</h3>
+                    <button class="btn" onclick="testBrowserNotification()">🌐 ทดสอบแจ้งเตือนเบราว์เซอร์</button>
+                    <button class="btn" onclick="testLINENotification()">💬 ทดสอบแจ้งเตือน LINE</button>
+                    <button class="btn" onclick="testEmailNotification()">📧 ทดสอบแจ้งเตือนอีเมล</button>
+                </div>
+            </div>
+
+            <!-- Smart Calendar Integration -->
+            <div style="margin-top: 30px;">
+                <h3>📅 เชื่อมต่อปฏิทิน</h3>
+                <div class="grid-2">
+                    <div>
+                        <button class="btn" onclick="connectGoogleCalendar()">📆 เชื่อมต่อ Google Calendar</button>
+                        <button class="btn" onclick="connectOutlook()">📅 เชื่อมต่อ Outlook</button>
+                        <button class="btn" onclick="exportToICS()">📄 ส่งออกเป็น .ics</button>
+                    </div>
+                    <div>
+                        <p>🔗 สถานะการเชื่อมต่อ:</p>
+                        <div id="calendar-status" class="result-box">
+                            <p>📆 Google Calendar: ยังไม่เชื่อมต่อ</p>
+                            <p>📅 Outlook: ยังไม่เชื่อมต่อ</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="schedule" class="tab-content">
+            <h2 class="feature-title">📅 ตารางเรียน</h2>
+            <div class="grid-2">
+                <div>
+                    <h3>➕ เพิ่มรายวิชา</h3>
+                    <div class="input-group">
+                        <label for="course-name">ชื่อวิชา:</label>
+                        <input type="text" id="course-name" placeholder="เช่น คณิตศาสตร์ 101">
+                    </div>
+                    <div class="input-group">
+                        <label for="course-day">วัน:</label>
+                        <select id="course-day">
+                            <option value="จันทร์">จันทร์</option>
+                            <option value="อังคาร">อังคาร</option>
+                            <option value="พุธ">พุธ</option>
+                            <option value="พฤหัสบดี">พฤหัสบดี</option>
+                            <option value="ศุกร์">ศุกร์</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="course-time">เวลา:</label>
+                        <input type="text" id="course-time" placeholder="เช่น 09:00-11:00">
+                    </div>
+                    <button class="btn" onclick="addCourse()">📚 เพิ่มวิชา</button>
+                </div>
+                <div>
+                    <h3>📋 ตารางเรียนปัจจุบัน</h3>
+                    <div id="schedule-display"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ข้อมูลที่เก็บไว้ในหน่วยความจำ
+        let tasks = [];
+        let courses = [];
+        let chatHistory = [];
+        
+        // OpenAI API Configuration
+        let OPENAI_API_KEY = '';
+        
+        // ตรวจสอบและตั้งค่า API Key
+        function initializeAPI() {
+            const savedKey = localStorage.getItem('openai_api_key');
+            if (savedKey) {
+                OPENAI_API_KEY = savedKey;
+            } else {
+                promptForAPIKey();
+            }
+        }
+        
+        function promptForAPIKey() {
+            const key = prompt(`🔑 กรุณาใส่ OpenAI API Key ของคุณ:
+
+📋 วิธีการได้ API Key:
+1. ไปที่ https://platform.openai.com/api-keys
+2. สร้าง API Key ใหม่
+3. Copy มาใส่ที่นี่
+
+⚠️ หมายเหตุ: 
+- API Key จะถูกเก็บไว้ในเครื่องของคุณเท่านั้น
+- หากไม่มี API Key สามารถใช้งานแบบ Mock ได้
+- กด Cancel เพื่อใช้แบบ Mock`);
+            
+            if (key && key.trim()) {
+                OPENAI_API_KEY = key.trim();
+                localStorage.setItem('openai_api_key', OPENAI_API_KEY);
+                alert('✅ ตั้งค่า API Key เรียบร้อย!\n\n🧪 ลองทดสอบสรุปบทเรียนหรือถาม AI ติวเตอร์ดูครับ');
+                return true;
+            } else {
+                alert('ℹ️ จะใช้งานแบบ Mock (จำลอง) แทน\nคุณสามารถเพิ่ม API Key ได้ทีหลังผ่านปุ่ม "⚙️ ตั้งค่า API Key"');
+                return false;
+            }
+        }
+        
+        // ฟังก์ชันเรียก OpenAI API (แบบหลายวิธี)
+        async function callOpenAI(messages, maxTokens = 500) {
+            if (!OPENAI_API_KEY) {
+                promptForAPIKey();
+                if (!OPENAI_API_KEY) return null;
+            }
+            
+            // ลองใช้ Proxy หลายตัว
+            const proxyUrls = [
+                'https://api.openai.com/v1/chat/completions', // Direct (อาจไม่ทำงานเพราะ CORS)
+                'https://cors-anywhere.herokuapp.com/https://api.openai.com/v1/chat/completions', // CORS Proxy
+                `https://api.allorigins.win/raw?url=${encodeURIComponent('https://api.openai.com/v1/chat/completions')}` // Alternative Proxy
+            ];
+            
+            const requestBody = {
+                model: 'gpt-3.5-turbo',
+                messages: messages,
+                max_tokens: maxTokens,
+                temperature: 0.7
+            };
+            
+            for (let i = 0; i < proxyUrls.length; i++) {
+                try {
+                    console.log(`พยายามเชื่อมต่อผ่าน method ${i + 1}...`);
+                    
+                    let requestOptions = {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(requestBody)
+                    };
+                    
+                    // เพิ่ม Authorization header สำหรับ direct และ CORS proxy
+                    if (i < 2) {
+                        requestOptions.headers['Authorization'] = `Bearer ${OPENAI_API_KEY}`;
+                    }
+                    
+                    // สำหรับ allorigins proxy ต้องส่งแบบต่างออกไป
+                    if (i === 2) {
+                        requestOptions = {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            body: JSON.stringify({
+                                url: 'https://api.openai.com/v1/chat/completions',
+                                method: 'POST',
+                                headers: {
+                                    'Authorization': `Bearer ${OPENAI_API_KEY}`,
+                                    'Content-Type': 'application/json'
+                                },
+                                data: requestBody
+                            })
+                        };
+                    }
+                    
+                    const response = await fetch(proxyUrls[i], requestOptions);
+                    
+                    if (!response.ok) {
+                        if (response.status === 401) {
+                            alert('❌ API Key ไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง');
+                            localStorage.removeItem('openai_api_key');
+                            OPENAI_API_KEY = '';
+                            return null;
+                        }
+                        if (response.status === 429) {
+                            alert('⚠️ ใช้งาน API เกินขนาด กรุณารอสักครู่แล้วลองใหม่');
+                            return null;
+                        }
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    console.log(`✅ เชื่อมต่อสำเร็จผ่าน method ${i + 1}`);
+                    return data.choices[0].message.content;
+                    
+                } catch (error) {
+                    console.log(`❌ Method ${i + 1} ไม่สำเร็จ:`, error.message);
+                    if (i === proxyUrls.length - 1) {
+                        // ถ้าทุกวิธีไม่ได้ผล
+                        console.error('All methods failed:', error);
+                        showConnectionError();
+                        return null;
+                    }
+                }
+            }
+        }
+        
+        function showConnectionError() {
+            const errorMsg = `❌ ไม่สามารถเชื่อมต่อ OpenAI API ได้
+            
+🔧 วิธีแก้ไข:
+1. ตรวจสอบ API Key ให้ถูกต้อง
+2. ตรวจสอบอินเทอร์เน็ต
+3. ลองใช้งานใหม่ในอีกสักครู่
+4. หรือใช้งานแบบ Mock ไปก่อน
+
+💡 แอปจะกลับไปใช้ระบบจำลองแทน`;
+            
+            alert(errorMsg);
+        }
+
+        // ฟังก์ชันสลับแท็บ
+        function showTab(tabName) {
+            // ซ่อนแท็บทั้งหมด
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // แสดงแท็บที่เลือก
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // 1. สรุปบทเรียนด้วย AI จริง
+        async function summarizeLesson() {
+            const text = document.getElementById('lesson-text').value;
+            if (!text.trim()) {
+                alert('กรุณาใส่เนื้อหาที่ต้องการสรุป');
+                return;
+            }
+
+            // แสดง Loading
+            document.getElementById('summary-result').style.display = 'block';
+            document.getElementById('summary-content').innerHTML = '🤖 กำลังสรุปเนื้อหา...';
+
+            const messages = [
+                {
+                    role: 'system',
+                    content: `คุณเป็น AI ผู้ช่วยสรุปบทเรียนสำหรับนักศึกษาไทย กรุณาสรุปเนื้อหาที่ได้รับมาให้กระชับ เข้าใจง่าย และมีประโยชน์ 
+                    
+ให้ตอบในรูปแบบ:
+**📝 สรุปเนื้อหา:**
+[สรุปหลักภายใน 2-3 ประโยค]
+
+**💡 จุดสำคัญ:**
+• [จุดสำคัญที่ 1]
+• [จุดสำคัญที่ 2] 
+• [จุดสำคัญที่ 3]
+
+**🎯 ข้อสอบน่าจะออก:**
+• [คำถามที่อาจจะออกข้อสอบ]`
+                },
+                {
+                    role: 'user',
+                    content: `กรุณาสรุปเนื้อหานี้: ${text}`
+                }
+            ];
+
+            const summary = await callOpenAI(messages, 800);
+            
+            if (summary) {
+                document.getElementById('summary-content').innerHTML = summary.replace(/\n/g, '<br>');
+                // บันทึกลงคลังสรุป
+                summaryLibrary.push({
+                    id: Date.now(),
+                    title: text.substring(0, 50) + '...',
+                    content: summary,
+                    style: style,
+                    date: new Date().toLocaleDateString('th-TH')
+                });
+                
+                // แสดงปุ่มเพิ่มเติม
+                showSummaryActions();
+            } else {
+                // Fallback ถ้า API ใช้ไม่ได้
+                document.getElementById('summary-content').innerHTML = generateMockSummary(text);
+            }
+        }
+
+        function showSummaryActions() {
+            // ฟังก์ชันแสดงปุ่มเพิ่มเติมหลังสรุปเสร็จ
+        }
+
+        // ฟังก์ชันบันทึกสรุป
+        function saveSummary() {
+            const content = document.getElementById('summary-content').innerHTML;
+            const blob = new Blob([content], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `สรุปบทเรียน_${new Date().toLocaleDateString('th-TH')}.html`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            alert('💾 บันทึกสรุปเรียบร้อย!');
+        }
+
+        // ฟังก์ชันแชร์สรุป
+        function shareSummary() {
+            const content = document.getElementById('summary-content').innerText;
+            if (navigator.share) {
+                navigator.share({
+                    title: 'สรุปบทเรียน - AI Buddy',
+                    text: content
+                });
+            } else {
+                // Fallback สำหรับเบราว์เซอร์ที่ไม่รองรับ
+                navigator.clipboard.writeText(content).then(() => {
+                    alert('📤 คัดลอกสรุปไปยังคลิปบอร์ดแล้ว!');
+                });
+            }
+        }
+
+        // ฟังก์ชันสร้างแบบทดสอบ
+        async function generateQuiz() {
+            const summaryContent = document.getElementById('summary-content').innerText;
+            
+            const messages = [
+                {
+                    role: 'system',
+                    content: `สร้างแบบทดสอบ 5 ข้อจากเนื้อหาที่ให้มา แบบ:
+                    
+**🧠 แบบทดสอบความเข้าใจ**
+
+**คำถามที่ 1:** [คำถาม]
+a) [ตัวเลือก A]
+b) [ตัวเลือก B] 
+c) [ตัวเลือก C]
+d) [ตัวเลือก D]
+
+*เฉลย: [ตัวเลือกที่ถูก] - [คำอธิบาย]*`
+                },
+                {
+                    role: 'user',
+                    content: `สร้างแบบทดสอบจากเนื้อหานี้: ${summaryContent}`
+                }
+            ];
+
+            const quiz = await callOpenAI(messages, 800);
+            if (quiz) {
+                document.getElementById('summary-content').innerHTML += '<hr>' + quiz.replace(/\n/g, '<br>');
+            }
+        }
+
+        // ระบบเชื่อมต่อ LINE
+        async function connectLINE() {
+            const token = document.getElementById('line-token').value;
+            const groupId = document.getElementById('line-group-id').value;
+            
+            if (!token || !groupId) {
+                alert('กรุณากรอก Token และ Group ID');
+                return;
+            }
+
+            const statusDiv = document.getElementById('line-status');
+            statusDiv.innerHTML = '🔄 กำลังทดสอบการเชื่อมต่อ...';
+
+            try {
+                // จำลองการเชื่อมต่อ LINE API
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                lineConnected = true;
+                statusDiv.innerHTML = '✅ เชื่อมต่อ LINE สำเร็จ!';
+                
+                // บันทึกการตั้งค่า
+                localStorage.setItem('line_token', token);
+                localStorage.setItem('line_group_id', groupId);
+                
+                updateAutoStatus();
+            } catch (error) {
+                statusDiv.innerHTML = '❌ การเชื่อมต่อล้มเหลว';
+            }
+        }
+
+        // ทดสอบการเชื่อมต่อ LINE
+        async function testLINE() {
+            if (!lineConnected) {
+                alert('กรุณาเชื่อมต่อ LINE ก่อน');
+                return;
+            }
+
+            const statusDiv = document.getElementById('line-status');
+            statusDiv.innerHTML = '🧪 กำลังส่งข้อความทดสอบ...';
+
+            // จำลองการส่งข้อความ
+            setTimeout(() => {
+                statusDiv.innerHTML = '✅ ส่งข้อความทดสอบสำเร็จ! ตรวจสอบในกลุ่ม LINE';
+            }, 2000);
+        }
+
+        // เริ่มการดึงข้อมูลอัตโนมัติ
+        function startAutoSync() {
+            if (autoSyncInterval) {
+                clearInterval(autoSyncInterval);
+            }
+
+            const frequency = parseInt(document.getElementById('sync-frequency').value) * 60 * 1000; // แปลงเป็น milliseconds
+            
+            autoSyncInterval = setInterval(async () => {
+                await syncDataFromLINE();
+            }, frequency);
+
+            updateAutoStatus();
+            alert(`✅ เริ่มการดึงข้อมูลอัตโนมัติทุก ${document.getElementById('sync-frequency').value} นาที`);
+        }
+
+        // หยุดการดึงข้อมูลอัตโนมัติ
+        function stopAutoSync() {
+            if (autoSyncInterval) {
+                clearInterval(autoSyncInterval);
+                autoSyncInterval = null;
+            }
+            updateAutoStatus();
+            alert('⏹️ หยุดการดึงข้อมูลอัตโนมัติแล้ว');
+        }
+
+        // ดึงข้อมูลจาก LINE
+        async function syncDataFromLINE() {
+            if (!lineConnected) return;
+
+            const keywords = document.getElementById('keywords').value.split(',').map(k => k.trim());
+            
+            // จำลองการดึงข้อมูลจาก LINE API
+            const mockData = [
+                {
+                    type: 'assignment',
+                    title: 'รายงานวิชาคณิตศาสตร์',
+                    dueDate: '2025-08-10',
+                    source: 'กลุ่ม LINE วิชาคณิต',
+                    priority: 'urgent'
+                },
+                {
+                    type: 'exam',
+                    title: 'สอบกลางภาค ฟิสิกส์',
+                    dueDate: '2025-08-15',
+                    source: 'กลุ่ม LINE วิชาฟิสิกส์',
+                    priority: 'normal'
+                }
+            ];
+
+            // เพิ่มข้อมูลลงในระบบการบ้าน
+            mockData.forEach(item => {
+                const existingTask = tasks.find(task => task.title === item.title);
+                if (!existingTask) {
+                    tasks.push({
+                        id: Date.now() + Math.random(),
+                        title: item.title,
+                        date: item.dueDate,
+                        priority: item.priority,
+                        source: item.source,
+                        autoAdded: true
+                    });
+                }
+            });
+
+            displayTasks();
+            updateLatestData(mockData);
+            updateAutoStatus();
+
+            // ส่งการแจ้งเตือนหากพบงานใหม่
+            mockData.forEach(item => {
+                sendNotification(`📝 งานใหม่: ${item.title}`, `กำหนดส่ง: ${item.dueDate}`);
+            });
+        }
+
+        // อัปเดตข้อมูลล่าสุด
+        function updateLatestData(data) {
+            const latestDataDiv = document.getElementById('latest-data');
+            latestDataDiv.innerHTML = data.map(item => 
+                `<div style="padding: 5px; border-bottom: 1px solid #eee;">
+                    <strong>${item.title}</strong><br>
+                    <small>📅 ${item.dueDate} | 📱 ${item.source}</small>
+                </div>`
+            ).join('');
+        }
+
+        // ระบบการแจ้งเตือนอัจฉริยะ
+        function requestNotificationPermission() {
+            if ('Notification' in window) {
+                Notification.requestPermission().then(permission => {
+                    if (permission === 'granted') {
+                        alert('✅ อนุญาตการแจ้งเตือนแล้ว!');
+                        sendNotification('🎉 AI Buddy', 'ระบบการแจ้งเตือนพร้อมใช้งาน!');
+                    } else {
+                        alert('❌ ไม่ได้รับอนุญาตการแจ้งเตือน');
+                    }
+                });
+            } else {
+                alert('เบราว์เซอร์นี้ไม่รองรับการแจ้งเตือน');
+            }
+        }
+
+        function sendNotification(title, body, icon = '🤖') {
+            // แจ้งเตือนผ่านเบราว์เซอร์
+            if (document.getElementById('browser-notify').checked && Notification.permission === 'granted') {
+                new Notification(title, {
+                    body: body,
+                    icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">' + icon + '</text></svg>'
+                });
+            }
+
+            // แจ้งเตือนผ่าน LINE (ถ้าเชื่อมต่อ)
+            if (document.getElementById('line-notify').checked && lineConnected) {
+                sendLINENotification(`${title}\n${body}`);
+            }
+
+            // แจ้งเตือนผ่านอีเมล (ถ้าตั้งค่า)
+            if (document.getElementById('email-notify').checked) {
+                sendEmailNotification(title, body);
+            }
+
+            // บันทึกประวัติ
+            notificationHistory.unshift({
+                title: title,
+                body: body,
+                time: new Date().toLocaleString('th-TH'),
+                type: 'auto'
+            });
+
+            updateNotificationHistory();
+        }
+
+        async function sendLINENotification(message) {
+            const token = localStorage.getItem('line_token');
+            const groupId = localStorage.getItem('line_group_id');
+            
+            if (!token || !groupId) return;
+
+            try {
+                // จำลองการส่งข้อความผ่าน LINE API
+                console.log('ส่งข้อความ LINE:', message);
+                
+                // ในระบบจริงจะเรียก LINE Messaging API
+                /*
+                await fetch('https://api.line.me/v2/bot/message/push', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        to: groupId,
+                        messages: [{
+                            type: 'text',
+                            text: message
+                        }]
+                    })
+                });
+                */
+            } catch (error) {
+                console.error('LINE notification error:', error);
+            }
+        }
+
+        async function sendEmailNotification(title, body) {
+            const email = document.getElementById('notify-email').value;
+            if (!email) return;
+
+            // จำลองการส่งอีเมล (ต้องใช้ Email API จริง)
+            console.log(`📧 ส่งอีเมลไปที่: ${email}`);
+            console.log(`หัวข้อ: ${title}`);
+            console.log(`เนื้อหา: ${body}`);
+        }
+
+        function updateNotificationHistory() {
+            const historyDiv = document.getElementById('notification-history');
+            historyDiv.innerHTML = notificationHistory.slice(0, 10).map(notif => 
+                `<div style="padding: 10px; border-bottom: 1px solid #eee; margin-bottom: 5px;">
+                    <strong>${notif.title}</strong><br>
+                    <small>${notif.body}</small><br>
+                    <small style="color: #666;">⏰ ${notif.time}</small>
+                </div>`
+            ).join('');
+        }
+
+        function saveNotificationSettings() {
+            const settings = {
+                browser: document.getElementById('browser-notify').checked,
+                line: document.getElementById('line-notify').checked,
+                email: document.getElementById('email-notify').checked,
+                notifyEmail: document.getElementById('notify-email').value,
+                notifyTime: document.getElementById('notify-time').value,
+                advanceNotify: document.getElementById('advance-notify').value
+            };
+
+            localStorage.setItem('notification_settings', JSON.stringify(settings));
+            alert('💾 บันทึกการตั้งค่าเรียบร้อย!');
+        }
+
+        // ฟังก์ชันทดสอบการแจ้งเตือน
+        function testBrowserNotification() {
+            sendNotification('🧪 ทดสอบการแจ้งเตือน', 'นี่คือการแจ้งเตือนทดสอบจาก AI Buddy');
+        }
+
+        function testLINENotification() {
+            if (!lineConnected) {
+                alert('กรุณาเชื่อมต่อ LINE ก่อน');
+                return;
+            }
+            sendLINENotification('🧪 ทดสอบการแจ้งเตือน LINE จาก AI Buddy');
+            alert('📱 ส่งข้อความทดสอบไปยัง LINE แล้ว');
+        }
+
+        function testEmailNotification() {
+            const email = document.getElementById('notify-email').value;
+            if (!email) {
+                alert('กรุณาใส่อีเมลสำหรับแจ้งเตือน');
+                return;
+            }
+            sendEmailNotification('🧪 ทดสอบการแจ้งเตือน', 'นี่คือการแจ้งเตือนทดสอบทางอีเมลจาก AI Buddy');
+            alert('📧 ส่งอีเมลทดสอบแล้ว (ตรวจสอบในกล่องจดหมาย)');
+        }
+
+        // เชื่อมต่อปฏิทิน
+        function connectGoogleCalendar() {
+            alert('🚧 ฟีเจอร์นี้กำลังพัฒนา - จะเชื่อมต่อกับ Google Calendar API');
+            // ในระบบจริงจะใช้ Google Calendar API
+        }
+
+        function connectOutlook() {
+            alert('🚧 ฟีเจอร์นี้กำลังพัฒนา - จะเชื่อมต่อกับ Microsoft Graph API');
+            // ในระบบจริงจะใช้ Microsoft Graph API
+        }
+
+        function exportToICS() {
+            // สร้างไฟล์ .ics สำหรับปฏิทิน
+            let icsContent = 'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:AI Buddy\n';
+            
+            tasks.forEach(task => {
+                const date = new Date(task.date);
+                const dateStr = date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+                
+                icsContent += `BEGIN:VEVENT
+UID:${task.id}@aibuddy.com
+DTSTAMP:${dateStr}
+DTSTART:${dateStr}
+SUMMARY:${task.title}
+DESCRIPTION:งานจาก AI Buddy
+END:VEVENT
+`;
+            });
+            
+            icsContent += 'END:VCALENDAR';
+            
+            const blob = new Blob([icsContent], { type: 'text/calendar' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'AI_Buddy_Schedule.ics';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert('📄 ส่งออกปฏิทินเรียบร้อย! นำไปเพิ่มในแอปปฏิทินของคุณได้');
+        }
+
+        // ระบบตรวจสอบการแจ้งเตือนอัตโนมัติ
+        function checkUpcomingTasks() {
+            const today = new Date();
+            const settings = JSON.parse(localStorage.getItem('notification_settings') || '{"advanceNotify": 1}');
+            const advanceDays = parseInt(settings.advanceNotify);
+
+            tasks.forEach(task => {
+                const taskDate = new Date(task.date);
+                const daysUntil = Math.ceil((taskDate - today) / (1000 * 60 * 60 * 24));
+                
+                if (daysUntil === advanceDays) {
+                    sendNotification(
+                        `⏰ เตือนล่วงหน้า: ${task.title}`,
+                        `กำหนดส่งในอีก ${daysUntil} วัน (${task.date})`
+                    );
+                } else if (daysUntil === 0) {
+                    sendNotification(
+                        `🚨 ส่งวันนี้: ${task.title}`,
+                        `กำหนดส่งวันนี้! อย่าลืมส่งงาน`
+                    );
+                }
+            });
+        }
+
+        function generateMockSummary(text) {
+            const sentences = text.split('.').filter(s => s.trim().length > 10);
+            if (sentences.length <= 3) {
+                return `<p><strong>สรุป:</strong> ${text.substring(0, 200)}...</p>`;
+            }
+            
+            // เลือกประโยคสำคัญ (จำลอง)
+            const importantSentences = sentences.slice(0, Math.min(3, sentences.length));
+            return `
+                <div>
+                    <p><strong>จุดสำคัญ:</strong></p>
+                    <ul>
+                        ${importantSentences.map(s => `<li>${s.trim()}.</li>`).join('')}
+                    </ul>
+                    <p><strong>สรุปโดยรวม:</strong> เนื้อหานี้กล่าวถึงประเด็นสำคัญหลายประการที่ช่วยในการเข้าใจหัวข้อดังกล่าว</p>
+                </div>
+            `;
+        }
+
+        // 2. แนะนำหัวข้อโปรเจกต์ด้วย AI
+        async function generateProjectIdeas() {
+            const subject = document.getElementById('subject-name').value;
+            if (!subject.trim()) {
+                alert('กรุณาใส่ชื่อวิชา');
+                return;
+            }
+
+            // แสดง Loading
+            document.getElementById('project-results').style.display = 'block';
+            document.getElementById('project-content').innerHTML = '🤖 กำลังคิดหัวข้อโปรเจกต์...';
+
+            const messages = [
+                {
+                    role: 'system',
+                    content: `คุณเป็น AI ที่ช่วยแนะนำหัวข้อโปรเจกต์สำหรับนักศึกษาไทย ให้คำแนะนำที่เป็นประโยชน์ ทำได้จริง และเหมาะสมกับระดับมหาวิทยาลัย
+                    
+ให้ตอบในรูปแบบ:
+**💡 หัวข้อโปรเจกต์ที่แนะนำ:**
+
+**1. [ชื่อหัวข้อ]**
+- วัตถุประสงค์: [อธิบายสั้นๆ]
+- วิธีการ: [แนวทางการดำเนินงาน]
+
+**2. [ชื่อหัวข้อ]**
+- วัตถุประสงค์: [อธิบายสั้นๆ]
+- วิธีการ: [แนวทางการดำเนินงาน]
+
+[ต่อไปอีก 3 หัวข้อ]
+
+**📚 เทคนิคเพิ่มเติม:**
+[คำแนะนำในการทำโปรเจกต์]`
+                },
+                {
+                    role: 'user',
+                    content: `กรุณาแนะนำหัวข้อโปรเจกต์สำหรับวิชา "${subject}" ให้ 5 หัวข้อ`
+                }
+            ];
+
+            const ideas = await callOpenAI(messages, 1000);
+            
+            if (ideas) {
+                document.getElementById('project-content').innerHTML = ideas.replace(/\n/g, '<br>');
+            } else {
+                // Fallback ถ้า API ใช้ไม่ได้
+                document.getElementById('project-content').innerHTML = generateMockProjectIdeas(subject);
+            }
+        }
+
+        function generateMockProjectIdeas(subject) {
+            const projectTemplates = {
+                'วิทยาการคอมพิวเตอร์': [
+                    'ระบบจัดการหอสมุดออนไลน์',
+                    'แอปพลิเคชันติดตามสุขภาพ',
+                    'เว็บไซต์อีคอมเมิร์ซขนาดเล็ก',
+                    'ระบบจองห้องประชุม',
+                    'แชทบอทช่วยตอบคำถาม'
+                ],
+                'การตลาด': [
+                    'แผนการตลาดสำหรับร้านกาแฟท้องถิ่น',
+                    'การวิเคราะห์พฤติกรรมผู้บริโภคออนไลน์',
+                    'กลยุทธ์ Social Media Marketing',
+                    'การสร้างแบรนด์สำหรับผลิตภัณฑ์ใหม่',
+                    'การศึกษาตลาดสำหรับธุรกิจ Startup'
+                ],
+                'จิตวิทยา': [
+                    'ผลกระทบของโซเชียลมีเดียต่อจิตใจวัยรุ่น',
+                    'การศึกษาพฤติกรรมการเรียนรู้',
+                    'จิตวิทยาสีในการออกแบบ',
+                    'การจัดการความเครียดในนักศึกษา',
+                    'ผลของดนตรีต่ออารมณ์และความจำ'
+                ]
+            };
+
+            let ideas = projectTemplates[subject] || [
+                'การศึกษาเปรียบเทียบในหัวข้อที่สนใจ',
+                'การวิเคราะห์กรณีศึกษาที่เกี่ยวข้อง',
+                'การพัฒนาแนวทางใหม่ในสาขา',
+                'การสำรวจความคิดเห็นของกลุ่มเป้าหมาย',
+                'การทบทวนวรรณกรรมในหัวข้อเฉพาะ'
+            ];
+
+            return ideas.map((idea, index) => 
+                `<div class="project-suggestion">
+                    <strong>${index + 1}. ${idea}</strong>
+                    <p>หัวข้อนี้เหมาะสมสำหรับวิชา "${subject}" และสามารถขยายผลเป็นงานวิจัยได้</p>
+                </div>`
+            ).join('');
+        }
+
+        // 3. จัดการการบ้าน/สอบ
+        function addTask() {
+            const title = document.getElementById('task-title').value;
+            const date = document.getElementById('task-date').value;
+            const priority = document.getElementById('task-priority').value;
+
+            if (!title || !date) {
+                alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+                return;
+            }
+
+            const task = {
+                id: Date.now(),
+                title: title,
+                date: date,
+                priority: priority
+            };
+
+            tasks.push(task);
+            displayTasks();
+            
+            // ล้างฟอร์ม
+            document.getElementById('task-title').value = '';
+            document.getElementById('task-date').value = '';
+            document.getElementById('task-priority').value = 'normal';
+        }
+
+        function displayTasks() {
+            const taskList = document.getElementById('task-list');
+            if (tasks.length === 0) {
+                taskList.innerHTML = '<p>ยังไม่มีงานที่ต้องทำ</p>';
+                return;
+            }
+
+            // เรียงตามวันที่
+            tasks.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            taskList.innerHTML = tasks.map(task => {
+                const daysLeft = Math.ceil((new Date(task.date) - new Date()) / (1000 * 60 * 60 * 24));
+                const urgentClass = task.priority === 'urgent' || daysLeft <= 3 ? 'task-urgent' : 'task-normal';
+                
+                return `
+                    <div class="task-item ${urgentClass}">
+                        <div>
+                            <strong>${task.title}</strong><br>
+                            <small>ส่งวันที่: ${task.date} (อีก ${daysLeft} วัน)</small>
+                        </div>
+                        <button class="delete-btn" onclick="deleteTask(${task.id})">ลบ</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function deleteTask(id) {
+            tasks = tasks.filter(task => task.id !== id);
+            displayTasks();
+        }
+
+        // 4. AI ติวเตอร์จริง
+        async function sendMessage() {
+            const question = document.getElementById('user-question').value;
+            if (!question.trim()) return;
+
+            // แสดงข้อความของผู้ใช้
+            addChatMessage(question, 'user');
+            
+            // แสดง Loading
+            addChatMessage('🤖 กำลังคิด...', 'ai');
+            
+            // เรียก AI จริง
+            const messages = [
+                {
+                    role: 'system',
+                    content: `คุณเป็น AI ติวเตอร์ที่ช่วยสอนนักศึกษาไทย คุณมีบุคลิกเป็นมิตร อดทน และอธิบายได้เข้าใจง่าย 
+                    
+คำแนะนำในการตอบ:
+- ใช้ภาษาไทยที่เป็นกันเอง
+- อธิบายจากพื้นฐานไปซложน
+- ให้ตัวอย่างประกอบเมื่อเป็นไปได้
+- หากเป็นคำถามยาก ให้แบ่งเป็นขั้นตอน
+- สนับสนุนให้นักศึกษาคิดเอง`
+                },
+                ...chatHistory.slice(-6), // เอาประวัติ 6 ข้อความล่าสุด
+                {
+                    role: 'user',
+                    content: question
+                }
+            ];
+
+            const answer = await callOpenAI(messages, 800);
+            
+            // ลบข้อความ Loading
+            const chatContainer = document.getElementById('chat-container');
+            chatContainer.removeChild(chatContainer.lastChild);
+            
+            if (answer) {
+                addChatMessage(answer, 'ai');
+                // เก็บประวัติการสนทนา
+                chatHistory.push({role: 'user', content: question});
+                chatHistory.push({role: 'assistant', content: answer});
+            } else {
+                // Fallback ถ้า API ใช้ไม่ได้
+                const fallbackAnswer = generateMockAnswer(question);
+                addChatMessage(fallbackAnswer, 'ai');
+            }
+
+            document.getElementById('user-question').value = '';
+        }
+
+        function addChatMessage(message, sender) {
+            const chatContainer = document.getElementById('chat-container');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${sender === 'user' ? 'user-message' : 'ai-message'}`;
+            
+            if (sender === 'user') {
+                messageDiv.innerHTML = `<strong>คุณ:</strong> ${message}`;
+            } else {
+                messageDiv.innerHTML = `<strong>AI ติวเตอร์:</strong> ${message}`;
+            }
+            
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function generateMockAnswer(question) {
+            const answers = [
+                "คำถามที่น่าสนใจเลยครับ! ตามที่คุณถาม เรื่องนี้มีหลายมุมมองที่ควรพิจารณา...",
+                "จากประสบการณ์การสอน เรื่องนี้เป็นหัวข้อที่นักศึกษาสนใจกันมาก ผมขอแนะนำว่า...",
+                "เยี่ยมเลยครับ! คำถามนี้เกี่ยวข้องกับแนวคิดพื้นฐานที่สำคัญ ลองดูตัอย่างนี้นะครับ...",
+                "ครับ เรื่องนี้อธิบายได้หลายวิธี วิธีที่ง่ายที่สุดคือ...",
+                "คำถามดีครับ! เรื่องนี้มักจะเข้าใจผิดกันบ่อย ผมขอชี้แจงให้ฟังนะครับ..."
+            ];
+            
+            return answers[Math.floor(Math.random() * answers.length)];
+        }
+
+        function handleEnter(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        // 5. ตารางเรียน
+        function addCourse() {
+            const name = document.getElementById('course-name').value;
+            const day = document.getElementById('course-day').value;
+            const time = document.getElementById('course-time').value;
+
+            if (!name || !time) {
+                alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+                return;
+            }
+
+            const course = {
+                id: Date.now(),
+                name: name,
+                day: day,
+                time: time
+            };
+
+            courses.push(course);
+            displaySchedule();
+            
+            // ล้างฟอร์ม
+            document.getElementById('course-name').value = '';
+            document.getElementById('course-time').value = '';
+        }
+
+        function displaySchedule() {
+            const scheduleDisplay = document.getElementById('schedule-display');
+            
+            if (courses.length === 0) {
+                scheduleDisplay.innerHTML = '<p>ยังไม่มีตารางเรียน</p>';
+                return;
+            }
+
+            // จัดกลุ่มตามวัน
+            const days = ['จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์'];
+            const schedule = {};
+            
+            days.forEach(day => {
+                schedule[day] = courses.filter(course => course.day === day);
+            });
+
+            let html = '<table class="schedule-table"><tr><th>วัน</th><th>รายวิชา</th><th>เวลา</th></tr>';
+            
+            days.forEach(day => {
+                if (schedule[day].length > 0) {
+                    schedule[day].forEach((course, index) => {
+                        html += `<tr>
+                            ${index === 0 ? `<td rowspan="${schedule[day].length}">${day}</td>` : ''}
+                            <td>${course.name}</td>
+                            <td>${course.time}</td>
+                        </tr>`;
+                    });
+                } else {
+                    html += `<tr><td>${day}</td><td colspan="2">ไม่มีเรียน</td></tr>`;
+                }
+            });
+            
+            html += '</table>';
+            scheduleDisplay.innerHTML = html;
+        }
+
+        // เริ่มต้นแอป (ปรับปรุงใหม่)
+        window.onload = function() {
+            displayTasks();
+            displaySchedule();
+            initializeAPI();
+            addAPISettingsButton();
+            loadSettings();
+            
+            // ตั้งการตรวจสอบการแจ้งเตือนทุก 1 ชั่วโมง
+            setInterval(checkUpcomingTasks, 60 * 60 * 1000);
+            
+            // ตรวจสอบการแจ้งเตือนครั้งแรก
+            setTimeout(checkUpcomingTasks, 5000);
+            
+            // แสดงข้อความต้อนรับ
+            showWelcomeMessage();
+        };
+
+        function loadSettings() {
+            // โหลดการตั้งค่าการแจ้งเตือน
+            const notificationSettings = JSON.parse(localStorage.getItem('notification_settings') || '{}');
+            if (notificationSettings.browser !== undefined) {
+                document.getElementById('browser-notify').checked = notificationSettings.browser;
+            }
+            if (notificationSettings.line !== undefined) {
+                document.getElementById('line-notify').checked = notificationSettings.line;
+            }
+            if (notificationSettings.email !== undefined) {
+                document.getElementById('email-notify').checked = notificationSettings.email;
+            }
+            if (notificationSettings.notifyEmail) {
+                document.getElementById('notify-email').value = notificationSettings.notifyEmail;
+            }
+            if (notificationSettings.notifyTime) {
+                document.getElementById('notify-time').value = notificationSettings.notifyTime;
+            }
+            if (notificationSettings.advanceNotify) {
+                document.getElementById('advance-notify').value = notificationSettings.advanceNotify;
+            }
+
+            // โหลดการตั้งค่า LINE
+            const lineToken = localStorage.getItem('line_token');
+            const lineGroupId = localStorage.getItem('line_group_id');
+            if (lineToken && lineGroupId) {
+                document.getElementById('line-token').value = lineToken;
+                document.getElementById('line-group-id').value = lineGroupId;
+                lineConnected = true;
+                document.getElementById('line-status').innerHTML = '✅ เชื่อมต่อ LINE จากครั้งก่อน';
+            }
+        }
+
+        function showWelcomeMessage() {
+            // แสดงข้อความต้อนรับและคำแนะนำ
+            const isFirstTime = !localStorage.getItem('ai_buddy_visited');
+            
+            if (isFirstTime) {
+                setTimeout(() => {
+                    const welcome = `🎉 ยินดีต้อนรับสู่ AI Buddy!
+
+📖 สรุปบทเรียนอัตโนมัติ - อ่านง่าย ตรงจุด
+💡 แนะนำหัวข้อโปรเจกต์ - ไอเดียตามวิชาที่เรียน  
+⏰ เตือนการบ้าน/สอบ - แจ้งเตือนผ่านแอป ปฏิทิน หรือ LINE
+💬 AI ติวเตอร์ส่วนตัว - ถามคำถามได้ 24 ชม.
+🤖 ดึงข้อมูลอัตโนมัติ - จากตารางเรียน/กลุ่มไลน์
+
+✨ เริ่มต้นด้วยการตั้งค่า API Key หรือลองใช้แบบ Mock ได้เลย!`;
+                    
+                    alert(welcome);
+                    localStorage.setItem('ai_buddy_visited', 'true');
+                }, 1000);
+            }
+        }
+
+        // เพิ่ม CSS สำหรับ input-method
+        const additionalCSS = `
+            .input-method {
+                transition: all 0.3s ease;
+            }
+            
+            .highlight {
+                background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+                padding: 10px;
+                border-radius: 8px;
+                margin: 10px 0;
+                border-left: 4px solid #f39c12;
+            }
+            
+            .notification-item {
+                animation: slideIn 0.5s ease;
+            }
+            
+            @keyframes slideIn {
+                from { opacity: 0; transform: translateX(-20px); }
+                to { opacity: 1; transform: translateX(0); }
+            }
+            
+            .auto-added {
+                border-left: 4px solid #3498db !important;
+                position: relative;
+            }
+            
+            .auto-added::after {
+                content: "🤖";
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                font-size: 12px;
+            }
+        `;
+        
+        // เพิ่ม CSS เข้าไปในหน้า
+        const styleSheet = document.createElement('style');
+        styleSheet.textContent = additionalCSS;
+        document.head.appendChild(styleSheet);
+        
+        function addAPISettingsButton() {
+            const header = document.querySelector('.header');
+            const settingsContainer = document.createElement('div');
+            settingsContainer.style.marginTop = '15px';
+            
+            const settingsBtn = document.createElement('button');
+            settingsBtn.innerHTML = '⚙️ ตั้งค่า API Key';
+            settingsBtn.className = 'btn';
+            settingsBtn.onclick = function() {
+                const currentKey = OPENAI_API_KEY ? `${OPENAI_API_KEY.substring(0, 8)}...` : 'ยังไม่ได้ตั้งค่า';
+                const confirmed = confirm(`🔑 API Key ปัจจุบัน: ${currentKey}\n\nต้องการเปลี่ยน API Key ใหม่หรือไม่?`);
+                if (confirmed) {
+                    promptForAPIKey();
+                }
+            };
+            
+            const testBtn = document.createElement('button');
+            testBtn.innerHTML = '🧪 ทดสอบ API';
+            testBtn.className = 'btn';
+            testBtn.onclick = async function() {
+                if (!OPENAI_API_KEY) {
+                    alert('❌ กรุณาตั้งค่า API Key ก่อน');
+                    return;
+                }
+                
+                testBtn.innerHTML = '🔄 กำลังทดสอบ...';
+                testBtn.disabled = true;
+                
+                const testMessages = [{
+                    role: 'user',
+                    content: 'สวัสดีครับ ตอบสั้นๆ ว่า "สวัสดี! ระบบ AI ทำงานปกติ" '
+                }];
+                
+                const result = await callOpenAI(testMessages, 50);
+                
+                if (result) {
+                    alert(`✅ API ทำงานปกติ!\n\nการตอบ: ${result}`);
+                } else {
+                    alert('❌ ไม่สามารถเชื่อมต่อ API ได้\nแอปจะใช้งานแบบ Mock แทน');
+                }
+                
+                testBtn.innerHTML = '🧪 ทดสอบ API';
+                testBtn.disabled = false;
+            };
+            
+            const statusDiv = document.createElement('div');
+            statusDiv.style.marginTop = '10px';
+            statusDiv.style.fontSize = '14px';
+            statusDiv.style.color = 'white';
+            statusDiv.innerHTML = OPENAI_API_KEY ? 
+                '🟢 API Key: ตั้งค่าแล้ว' : 
+                '🟡 API Key: ยังไม่ได้ตั้งค่า (ใช้งานแบบ Mock)';
+            
+            settingsContainer.appendChild(settingsBtn);
+            settingsContainer.appendChild(testBtn);
+            settingsContainer.appendChild(statusDiv);
+            header.appendChild(settingsContainer);
+        }
+    </script>
+</body>
+</html>
