@@ -1,0 +1,325 @@
+
+<<html lang="th">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>AI Buddy - แอปช่วยเรียนสำหรับนักศึกษา</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>🤖 AI Buddy</h1>
+                <p>แอปช่วยเรียนอัจฉริยะสำหรับนักศึกษา</p>
+            </div>
+    
+            <div class="nav-tabs">
+                <button class="tab-btn active" onclick="showTab('summary', this)">📖 สรุปบทเรียน</button>
+                <button class="tab-btn" onclick="showTab('project', this)">💡 หัวข้อโปรเจกต์</button>
+                <button class="tab-btn" onclick="showTab('tasks', this)">⏰ การบ้าน/สอบ</button>
+                <button class="tab-btn" onclick="showTab('chat', this)">💬 AI ติวเตอร์</button>
+                <button class="tab-btn" onclick="showTab('schedule', this)">📅 ตารางเรียน</button>
+                <button class="tab-btn" onclick="showTab('auto', this)">🤖 ระบบอัตโนมัติ</button>
+                <button class="tab-btn" onclick="showTab('notifications', this)">🔔 การแจ้งเตือน</button>
+            </div>
+    
+                <div id="summary" class="tab-content active">
+                <h2 class="feature-title">📖 สรุปบทเรียนอัตโนมัติ</h2>
+                <div class="input-group">
+                    <label>🎯 เลือกวิธีการนำเข้าเนื้อหา:</label>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
+                        <button class="btn" onclick="showInputMethod('text')">📝 พิมพ์เอง</button>
+                        <button class="btn" onclick="showInputMethod('file')">📄 อัปโหลดไฟล์</button>
+                        <button class="btn" onclick="showInputMethod('url')">🌐 จาก URL</button>
+                        <button class="btn" onclick="showInputMethod('image')">📷 ถ่ายรูปเอกสาร</button>
+                    </div>
+                </div>
+    
+                <div id="text-input" class="input-method">
+                    <div class="input-group">
+                        <label for="lesson-text">วางเนื้อหาบทเรียนที่ต้องการสรุป:</label>
+                        <textarea id="lesson-text" rows="8" placeholder="วางเนื้อหาบทเรียนที่ต้องการสรุปที่นี่..."></textarea>
+                    </div>
+                </div>
+    
+                <div id="file-input" class="input-method" style="display: none;">
+                    <div class="input-group">
+                        <label for="lesson-file">อัปโหลดไฟล์เอกสาร (PDF, DOC, TXT):</label>
+                        <input type="file" id="lesson-file" accept=".pdf,.doc,.docx,.txt" onchange="handleFileUpload(event)">
+                        <small style="color: #666;">รองรับ: PDF, Word, Text Files</small>
+                    </div>
+                    <div id="file-content" style="display: none;">
+                        <h4>📄 เนื้อหาจากไฟล์:</h4>
+                        <div id="file-text" style="background: #f5f5f5; padding: 15px; border-radius: 8px; max-height: 200px; overflow-y: auto;"></div>
+                    </div>
+                </div>
+    
+                <div id="url-input" class="input-method" style="display: none;">
+                    <div class="input-group">
+                        <label for="lesson-url">URL ของเว็บไซต์หรือเอกสารออนไลน์:</label>
+                        <input type="url" id="lesson-url" placeholder="https://example.com/article">
+                        <button class="btn" onclick="fetchFromURL()">🔗 ดึงเนื้อหา</button>
+                    </div>
+                    <div id="url-content" style="display: none;">
+                        <h4>🌐 เนื้อหาจาก URL:</h4>
+                        <div id="url-text" style="background: #f5f5f5; padding: 15px; border-radius: 8px; max-height: 200px; overflow-y: auto;"></div>
+                    </div>
+                </div>
+    
+                <div id="image-input" class="input-method" style="display: none;">
+                    <div class="input-group">
+                        <label>📷 ถ่ายรูปหรืออัปโหลดรูปเอกสาร:</label>
+                        <input type="file" id="lesson-image" accept="image/*" capture="camera" onchange="handleImageUpload(event)">
+                        <button class="btn" onclick="document.getElementById('lesson-image').click()">📸 ถ่ายรูป</button>
+                    </div>
+                    <div id="image-preview" style="display: none;">
+                        <h4>🖼️ รูปที่อัปโหลด:</h4>
+                        <img id="preview-img" style="max-width: 100%; max-height: 300px; border-radius: 8px;">
+                        <button class="btn" onclick="extractTextFromImage()">🔍 แปลงเป็นข้อความ</button>
+                    </div>
+                    <div id="image-content" style="display: none;">
+                        <h4>📝 ข้อความจากรูป:</h4>
+                        <div id="image-text" style="background: #f5f5f5; padding: 15px; border-radius: 8px; max-height: 200px; overflow-y: auto;"></div>
+                    </div>
+                </div>
+    
+                <div class="input-group">
+                    <label>⚙️ รูปแบบการสรุป:</label>
+                    <select id="summary-style">
+                        <option value="simple">🎯 สรุปง่ายๆ พอใจ</option>
+                        <option value="detailed">📚 สรุปละเอียด</option>
+                        <option value="bullet">📝 จุดสำคัญย่อยๆ</option>
+                        <option value="exam">📝 เน้นข้อสอบ</option>
+                        <option value="mindmap">🧠 Mind Map</option>
+                    </select>
+                </div>
+    
+                <button class="btn" onclick="summarizeLesson()">🔍 สรุปเนื้อหาอัตโนมัติ</button>
+                <div id="summary-result" class="result-box" style="display: none;">
+                    <h3>📝 สรุปเนื้อหา:</h3>
+                    <div id="summary-content"></div>
+                    <div style="margin-top: 15px;">
+                        <button class="btn" onclick="saveSummary()">💾 บันทึกสรุป</button>
+                        <button class="btn" onclick="shareSummary()">📤 แชร์</button>
+                        <button class="btn" onclick="generateQuiz()">❓ สร้างแบบทดสอบ</button>
+                    </div>
+                </div>
+            </div>
+    
+            <div id="project" class="tab-content">
+                <h2 class="feature-title">💡 แนะนำหัวข้อโปรเจกต์</h2>
+                <div class="input-group">
+                    <label for="subject-name">ชื่อวิชา:</label>
+                    <input type="text" id="subject-name" placeholder="เช่น วิทยาการคอมพิวเตอร์, การตลาด, จิตวิทยา">
+                </div>
+                <button class="btn" onclick="generateProjectIdeas()">🎯 แนะนำหัวข้อ</button>
+                <div id="project-results" class="result-box" style="display: none;">
+                    <h3>💡 หัวข้อโปรเจกต์ที่แนะนำ:</h3>
+                    <div id="project-content"></div>
+                </div>
+            </div>
+    
+            <div id="tasks" class="tab-content">
+                <h2 class="feature-title">⏰ จัดการการบ้าน/สอบ</h2>
+                <div class="grid-2">
+                    <div>
+                        <h3>➕ เพิ่มงานใหม่</h3>
+                        <div class="input-group">
+                            <label for="task-title">ชื่องาน:</label>
+                            <input type="text" id="task-title" placeholder="เช่น รายงานวิชาคณิตศาสตร์">
+                        </div>
+                        <div class="input-group">
+                            <label for="task-date">วันที่ส่ง:</label>
+                            <input type="date" id="task-date">
+                        </div>
+                        <div class="input-group">
+                            <label for="task-priority">ความสำคัญ:</label>
+                            <select id="task-priority">
+                                <option value="normal">ปกติ</option>
+                                <option value="urgent">ด่วน</option>
+                            </select>
+                        </div>
+                        <button class="btn" onclick="addTask()">📝 เพิ่มงาน</button>
+                    </div>
+                    <div>
+                        <h3>📋 รายการงาน</h3>
+                        <div id="task-list"></div>
+                    </div>
+                </div>
+            </div>
+    
+            <div id="chat" class="tab-content">
+                <h2 class="feature-title">💬 แชทกับ AI ติวเตอร์</h2>
+                <div class="chat-container" id="chat-container">
+                    <div class="chat-message ai-message">
+                        <strong>AI ติวเตอร์:</strong> สวัสดีครับ! ผมพร้อมช่วยตอบคำถามเกี่ยวกับการเรียนนะครับ 😊
+                    </div>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="user-question" placeholder="พิมพ์คำถามของคุณที่นี่..." onkeypress="handleEnter(event)">
+                </div>
+                <button class="btn" onclick="sendMessage()">📤 ส่งคำถาม</button>
+            </div>
+    
+            <div id="auto" class="tab-content">
+                <h2 class="feature-title">🤖 ระบบอัตโนมัติ</h2>
+                <div style="background: #06c755; color: white; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                    <h3>💬 เชื่อมต่อ LINE</h3>
+                    <p>ดึงข้อมูลจากกลุ่มไลน์ตารางเรียนและส่งการแจ้งเตือนอัตโนมัติ</p>
+                    <div class="input-group">
+                        <label style="color: white;">LINE Channel Access Token:</label>
+                        <input type="text" id="line-token" placeholder="ใส่ Channel Access Token ของ LINE Bot">
+                    </div>
+                    <div class="input-group">
+                        <label style="color: white;">Group ID ของกลุ่มตารางเรียน:</label>
+                        <input type="text" id="line-group-id" placeholder="เช่น C1234567890abcdef1234567890abcdef1">
+                    </div>
+                    <button class="btn" style="background: white; color: #06c755;" onclick="connectLINE()">🔗 เชื่อมต่อ LINE</button>
+                    <button class="btn" style="background: rgba(255,255,255,0.2);" onclick="testLINE()">🧪 ทดสอบการเชื่อมต่อ</button>
+                    <div id="line-status" style="margin-top: 10px; font-size: 14px;"></div>
+                </div>
+    
+                <div class="grid-2">
+                    <div>
+                        <h3>📊 การดึงข้อมูลอัตโนมัติ</h3>
+                        <div class="input-group">
+                            <label>🔄 ความถี่ในการอัปเดต:</label>
+                            <select id="sync-frequency">
+                                <option value="5">ทุก 5 นาที</option>
+                                <option value="15">ทุก 15 นาที</option>
+                                <option value="30" selected>ทุก 30 นาที</option>
+                                <option value="60">ทุก 1 ชั่วโมง</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>📝 คำสำคัญที่ต้องมองหา:</label>
+                            <textarea id="keywords" rows="3" placeholder="การบ้าน, สอบ, โปรเจกต์, งาน, ส่ง, กำหนด, วันที่">การบ้าน, สอบ, โปรเจกต์, งาน, ส่ง, กำหนด, วันที่</textarea>
+                        </div>
+                        <button class="btn" onclick="startAutoSync()">▶️ เริ่มการดึงข้อมูลอัตโนมัติ</button>
+                        <button class="btn" onclick="stopAutoSync()">⏹️ หยุดการดึงข้อมูล</button>
+                    </div>
+    
+                    <div>
+                        <h3>📈 สถานะระบบ</h3>
+                        <div id="auto-status" class="result-box">
+                            <p>🔴 ระบบอัตโนมัติ: ปิด</p>
+                            <p>📱 LINE: ยังไม่เชื่อมต่อ</p>
+                            <p>🔄 อัปเดตล่าสุด: -</p>
+                            <p>📊 ข้อมูลที่พบ: 0 รายการ</p>
+                        </div>
+                        <h4>📋 ข้อมูลที่ดึงมาล่าสุด:</h4>
+                        <div id="latest-data" style="max-height: 200px; overflow-y: auto; background: #f9f9f9; padding: 10px; border-radius: 5px;">
+                            <p style="color: #999;">ยังไม่มีข้อมูล</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    
+            <div id="notifications" class="tab-content">
+                <h2 class="feature-title">🔔 ระบบการแจ้งเตือนอัจฉริยะ</h2>
+                <div class="grid-2">
+                    <div>
+                        <h3>⚙️ ตั้งค่าการแจ้งเตือน</h3>
+                        <div class="input-group">
+                            <label>
+                                <input type="checkbox" id="browser-notify" checked> 
+                                🌐 แจ้งเตือนผ่านเบราว์เซอร์
+                            </label>
+                        </div>
+                        <div class="input-group">
+                            <label>
+                                <input type="checkbox" id="line-notify" checked> 
+                                💬 แจ้งเตือนผ่าน LINE
+                            </label>
+                        </div>
+                        <div class="input-group">
+                            <label>
+                                <input type="checkbox" id="email-notify"> 
+                                📧 แจ้งเตือนผ่านอีเมล
+                            </label>
+                        </div>
+                        <div class="input-group">
+                            <label for="notify-email">อีเมลสำหรับแจ้งเตือน:</label>
+                            <input type="email" id="notify-email" placeholder="your@email.com">
+                        </div>
+                        <div class="input-group">
+                            <label for="notify-time">⏰ เวลาแจ้งเตือนประจำวัน:</label>
+                            <input type="time" id="notify-time" value="08:00">
+                        </div>
+                        <div class="input-group">
+                            <label for="advance-notify">📅 แจ้งเตือนล่วงหน้า:</label>
+                            <select id="advance-notify">
+                                <option value="0">วันเดียวกัน</option>
+                                <option value="1" selected>1 วันก่อน</option>
+                                <option value="2">2 วันก่อน</option>
+                                <option value="3">3 วันก่อน</option>
+                                <option value="7">1 สัปดาห์ก่อน</option>
+                            </select>
+                        </div>
+                        <button class="btn" onclick="saveNotificationSettings()">💾 บันทึกการตั้งค่า</button>
+                        <button class="btn" onclick="requestNotificationPermission()">🔔 ขออนุญาตแจ้งเตือน</button>
+                    </div>
+                    <div>
+                        <h3>📊 ประวัติการแจ้งเตือน</h3>
+                        <div id="notification-history" style="max-height: 300px; overflow-y: auto;">
+                        </div>
+                        <h3>🧪 ทดสอบการแจ้งเตือน</h3>
+                        <button class="btn" onclick="testBrowserNotification()">🌐 ทดสอบแจ้งเตือนเบราว์เซอร์</button>
+                        <button class="btn" onclick="testLINENotification()">💬 ทดสอบแจ้งเตือน LINE</button>
+                        <button class="btn" onclick="testEmailNotification()">📧 ทดสอบแจ้งเตือนอีเมล</button>
+                    </div>
+                </div>
+    
+                <div style="margin-top: 30px;">
+                    <h3>📅 เชื่อมต่อปฏิทิน</h3>
+                    <div class="grid-2">
+                        <div>
+                            <button class="btn" onclick="connectGoogleCalendar()">📆 เชื่อมต่อ Google Calendar</button>
+                            <button class="btn" onclick="connectOutlook()">📅 เชื่อมต่อ Outlook</button>
+                            <button class="btn" onclick="exportToICS()">📄 ส่งออกเป็น .ics</button>
+                        </div>
+                        <div>
+                            <p>🔗 สถานะการเชื่อมต่อ:</p>
+                            <div id="calendar-status" class="result-box">
+                                <p>📆 Google Calendar: ยังไม่เชื่อมต่อ</p>
+                                <p>📅 Outlook: ยังไม่เชื่อมต่อ</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="schedule" class="tab-content">
+                <h2 class="feature-title">📅 ตารางเรียน</h2>
+                <div class="grid-2">
+                    <div>
+                        <h3>➕ เพิ่มรายวิชา</h3>
+                        <div class="input-group">
+                            <label for="course-name">ชื่อวิชา:</label>
+                            <input type="text" id="course-name" placeholder="เช่น คณิตศาสตร์ 101">
+                        </div>
+                        <div class="input-group">
+                            <label for="course-day">วัน:</label>
+                            <select id="course-day">
+                                <option value="จันทร์">จันทร์</option>
+                                <option value="อังคาร">อังคาร</option>
+                                <option value="พุธ">พุธ</option>
+                                <option value="พฤหัสบดี">พฤหัสบดี</option>
+                                <option value="ศุกร์">ศุกร์</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="course-time">เวลา:</label>
+                            <input type="text" id="course-time" placeholder="เช่น 09:00-11:00">
+                        </div>
+                        <button class="btn" onclick="addCourse()">📚 เพิ่มวิชา</button>
+                    </div>
+                    <div>
+                        <h3>📋 ตารางเรียนปัจจุบัน</h3>
+                        <div id="schedule-display"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="script.js"></script>
+    </body>
+    </html>
