@@ -156,36 +156,52 @@ function showTab(tabName, element) {
 }
 
 async function summarizeLesson() {
-    const textToSummarize = document.getElementById('lesson-text').value;
-    const summaryResultDiv = document.getElementById('summary-result');
-    const summaryContentDiv = document.getElementById('summary-content');
-
-    if (!textToSummarize) {
-        alert('❌ กรุณาใส่เนื้อหาที่ต้องการสรุป');
+    const text = document.getElementById('lesson-text').value;
+    if (!text.trim()) {
+        alert('กรุณาใส่เนื้อหาที่ต้องการสรุป');
         return;
     }
 
-    summaryResultDiv.style.display = 'block';
-    summaryContentDiv.innerHTML = '🔄 กำลังสรุปบทเรียน...';
+    document.getElementById('summary-result').style.display = 'block';
+    document.getElementById('summary-content').innerHTML = '🤖 กำลังสรุปเนื้อหา...';
+
+    const messages = [
+        {
+            role: 'system',
+            content: `คุณเป็น AI ผู้ช่วยสรุปบทเรียนสำหรับนักศึกษาไทย กรุณาสรุปเนื้อหาที่ได้รับมาให้กระชับ เข้าใจง่าย และมีประโยชน์ 
+            
+ให้ตอบในรูปแบบ:
+**📝 สรุปเนื้อหา:**
+[สรุปหลักภายใน 2-3 ประโยค]
     
-    try {
-        const response = await fetch('http://localhost:3000/api/summarize', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ text: textToSummarize }),
-        });
-
-        if (!response.ok) {
-            throw new Error('Server response was not ok.');
+**💡 จุดสำคัญ:**
+• [จุดสำคัญที่ 1]
+• [จุดสำคัญที่ 2] 
+• [จุดสำคัญที่ 3]
+    
+**🎯 ข้อสอบน่าจะออก:**
+• [คำถามที่อาจจะออกข้อสอบ]`
+        },
+        {
+            role: 'user',
+            content: `กรุณาสรุปเนื้อหานี้: ${text}`
         }
+    ];
 
-        const data = await response.json();
-        summaryContentDiv.innerHTML = `<h3>สรุปบทเรียน:</h3><div class="highlight">${data.summary}</div>`;
-    } catch (error) {
-        console.error('Error fetching summary:', error);
-        summaryContentDiv.innerHTML = `<p class="error-message">❌ ไม่สามารถเชื่อมต่อกับ AI Backend ได้</p>`;
+    const summary = await callOpenAI(messages, 800);
+    
+    if (summary) {
+        document.getElementById('summary-content').innerHTML = summary.replace(/\n/g, '<br>');
+        summaryLibrary.push({
+            id: Date.now(),
+            title: text.substring(0, 50) + '...',
+            content: summary,
+            style: 'simple',
+            date: new Date().toLocaleDateString('th-TH')
+        });
+        showSummaryActions();
+    } else {
+        document.getElementById('summary-content').innerHTML = generateMockSummary(text);
     }
 }
 
