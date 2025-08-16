@@ -50,11 +50,10 @@ async function callOpenAI(messages, maxTokens = 500) {
         if (!OPENAI_API_KEY) return null;
     }
     
-    // Try multiple proxies
     const proxyUrls = [
-        'https://api.openai.com/v1/chat/completions', // Direct (may fail due to CORS)
-        'https://cors-anywhere.herokuapp.com/https://api.openai.com/v1/chat/completions', // CORS Proxy
-        `https://api.allorigins.win/raw?url=${encodeURIComponent('https://api.openai.com/v1/chat/completions')}` // Alternative Proxy
+        'https://api.openai.com/v1/chat/completions',
+        'https://cors-anywhere.herokuapp.com/https://api.openai.com/v1/chat/completions',
+        `https://api.allorigins.win/raw?url=${encodeURIComponent('https://api.openai.com/v1/chat/completions')}`
     ];
     
     const requestBody = {
@@ -153,50 +152,6 @@ function showTab(tabName, element) {
     
     document.getElementById(tabName).classList.add('active');
     element.classList.add('active');
-}
-function handleImageUpload(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const previewImg = document.getElementById('preview-img');
-        previewImg.src = e.target.result;
-        document.getElementById('image-preview').style.display = 'block';
-        document.getElementById('image-content').style.display = 'none';
-        document.getElementById('lesson-text').value = ''; 
-    };
-    reader.readAsDataURL(file);
-}
-async function extractTextFromImage() {
-    const previewImg = document.getElementById('preview-img');
-    const imageTextDiv = document.getElementById('image-text');
-    const lessonTextarea = document.getElementById('lesson-text');
-
-    if (!previewImg.src) {
-        alert('กรุณาอัปโหลดรูปภาพก่อน');
-        return;
-    }
-
-    imageTextDiv.innerHTML = '🤖 กำลังแปลงรูปภาพเป็นข้อความ...';
-    document.getElementById('image-content').style.display = 'block';
-
-    try {
-        const { data: { text } } = await Tesseract.recognize(
-            previewImg.src,
-            'tha+eng', 
-            { logger: m => console.log(m) }
-        );
-
-        imageTextDiv.innerHTML = text.replace(/\n/g, '<br>');
-        lessonTextarea.value = text;
-        alert('✅ แปลงข้อความจากรูปภาพสำเร็จแล้ว! คุณสามารถกด "สรุปเนื้อหาอัตโนมัติ" ได้เลย');
-
-    } catch (error) {
-        console.error('OCR Error:', error);
-        imageTextDiv.innerHTML = '❌ เกิดข้อผิดพลาดในการแปลงข้อความ กรุณาลองใหม่อีกครั้ง';
-        alert('❌ ไม่สามารถแปลงข้อความจากรูปภาพได้');
-    }
 }
 
 async function summarizeLesson() {
@@ -304,6 +259,7 @@ d) [ตัวเลือก D]
     ];
 
     const quiz = await callOpenAI(messages, 800);
+    
     if (quiz) {
         document.getElementById('summary-content').innerHTML += '<hr>' + quiz.replace(/\n/g, '<br>');
     }
@@ -314,10 +270,104 @@ function showInputMethod(method) {
     document.getElementById(`${method}-input`).style.display = 'block';
 }
 
-function handleFileUpload(event) {}
-function fetchFromURL() {}
-function handleImageUpload(event) {}
-function extractTextFromImage() {}
+// Function to handle file uploads (PDF, DOC, TXT)
+async function handleFileUpload(event) {
+    const file = event.target.files[0];
+    if (!file) {
+      return;
+    }
+  
+    const fileType = file.type;
+    const lessonTextarea = document.getElementById('lesson-text');
+  
+    try {
+      if (fileType.includes('text') || fileType.includes('pdf')) {
+        // For text-based files like TXT and DOCX (using a library for DOCX)
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          lessonTextarea.value = e.target.result;
+          alert('✅ อัปโหลดไฟล์สำเร็จแล้ว! คุณสามารถกด "สรุปเนื้อหาอัตโนมัติ" ได้เลย');
+        };
+        reader.readAsText(file);
+      } else {
+        alert('❌ รูปแบบไฟล์ไม่รองรับ');
+      }
+    } catch (error) {
+      console.error('File upload error:', error);
+      alert('❌ เกิดข้อผิดพลาดในการอัปโหลดไฟล์');
+    }
+  }
+  
+  // Function to fetch content from a URL
+  async function fetchFromURL() {
+    const url = document.getElementById('lesson-url').value;
+    const lessonTextarea = document.getElementById('lesson-text');
+  
+    if (!url) {
+      alert('⚠️ กรุณาใส่ URL ของเอกสารก่อน');
+      return;
+    }
+  
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const text = await response.text();
+      lessonTextarea.value = text;
+      alert('✅ ดึงเนื้อหาจาก URL สำเร็จแล้ว! คุณสามารถกด "สรุปเนื้อหาอัตโนมัติ" ได้เลย');
+    } catch (error) {
+      console.error('Fetch URL error:', error);
+      alert('❌ เกิดข้อผิดพลาดในการดึงข้อมูลจาก URL');
+    }
+  }
+
+// Function to handle image uploads
+function handleImageUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+  
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const previewImg = document.getElementById('preview-img');
+      previewImg.src = e.target.result;
+      document.getElementById('image-preview').style.display = 'block';
+      document.getElementById('image-content').style.display = 'none';
+      document.getElementById('lesson-text').value = ''; // Clear existing text
+    };
+    reader.readAsDataURL(file);
+  }
+
+async function extractTextFromImage() {
+    const previewImg = document.getElementById('preview-img');
+    const imageTextDiv = document.getElementById('image-text');
+    const lessonTextarea = document.getElementById('lesson-text');
+  
+    if (!previewImg.src) {
+      alert('กรุณาอัปโหลดรูปภาพก่อน');
+      return;
+    }
+  
+    imageTextDiv.innerHTML = '🤖 กำลังแปลงรูปภาพเป็นข้อความ...';
+    document.getElementById('image-content').style.display = 'block';
+  
+    try {
+      const { data: { text } } = await Tesseract.recognize(
+        previewImg.src,
+        'tha+eng', // ใช้ภาษาไทยและอังกฤษ
+        { logger: m => console.log(m) }
+      );
+  
+      imageTextDiv.innerHTML = text.replace(/\n/g, '<br>');
+      lessonTextarea.value = text;
+      alert('✅ แปลงข้อความจากรูปภาพสำเร็จแล้ว! คุณสามารถกด "สรุปเนื้อหาอัตโนมัติ" ได้เลย');
+  
+    } catch (error) {
+      console.error('OCR Error:', error);
+      imageTextDiv.innerHTML = '❌ เกิดข้อผิดพลาดในการแปลงข้อความ กรุณาลองใหม่อีกครั้ง';
+      alert('❌ ไม่สามารถแปลงข้อความจากรูปภาพได้');
+    }
+  }
 
 async function connectLINE() {
     const token = document.getElementById('line-token').value;
@@ -1038,6 +1088,7 @@ function addAPISettingsButton() {
         '🟢 API Key: ตั้งค่าแล้ว' : 
         '🟡 API Key: ยังไม่ได้ตั้งค่า (ใช้งานแบบ Mock)';
     
+        
     settingsContainer.appendChild(settingsBtn);
     settingsContainer.appendChild(testBtn);
     settingsContainer.appendChild(statusDiv);
